@@ -35,14 +35,14 @@ Dotted decimal resembles IPv4 notation but it's not fixed to four positions.
     10.247.1.1 + 10.236.228.4.18        -- five byte reference
     10.247.1.1 + 28.48.236.172          -- four byte reference (not an IP address)
 
-Definition of IPREF address using Augmented BNF
+Definition of IPREF address in Augmented BNF:
 
     ipref = ip *WSP "+" *WSP ref
 
     ip =  dotted-decimal-string
     ip =/ dns-name
 
-    dns-name = 1*(ALPHA / DIGIT) *( "-" 1*(ALPHA / DIGIT))
+    dns-name = 1*( ALPHA / DIGIT ) *( "-" 1*(ALPHA / DIGIT) )
 
     ref =  hex-string
     ref =/ decimal-string
@@ -67,3 +67,57 @@ As a workaround for an unavailable record type, IPREF uses TXT records to embed 
     host3               1800  TXT  "AA 10.247.1.1 + c184-234f-980a"
 
 An IPREF resolver must issues queries for A, AAAA, and AA/TXT records, then prefer AA/TXT over A/AAAA. Typically, A/AAAA would not return if AA/TXT is found but resolver cannot rely on that behavior.
+
+# Static IPREF address mapping
+
+IPREF can lookup a file with static address mapping in lieu of, or in addition to, DNS queries. Such file plays a similar role to /etc/hosts for IPv4/IPv6. This file has fixed name and location:
+
+    /etc/ipref/mapper.conf
+
+The format of the file follows that of /etc/hosts except it adds IPREF mapping option to each line. Mapping options start with '=' followed by mapping specification.
+
+    IP [HOSTNAME]... [= IPREF_MAPPING]
+
+For example:
+
+    192.168.1.174   host11 host1.example.com
+    192.168.2.87    host21                      = public
+    10.247.1.228                                = external gw.example.org + 2b78-2e89
+
+An entry in mapper.conf may designate a host as local, not visible externally, or it may designate a host as public, in which case the host will be accessible externally via an allocated IPREF address.  The allocation may be implicit where the ip portion and the reference portion of the IPREF address is left to the system to assign. It may also be explicit where the the reference, or ip address and the reverence, is listed directly in the entry. An entry may also describe an external IPREF address with its associated local encoded address by which local host may reach it.
+
+The different mapping options are indicated by a keyword such as _public_, _local_, or _external_. Keywords may be shorted to their first three letters.
+
+These entries describe hosts that are local, inaccessible externally. The use of _local_ keyword is sometimes convenient when switching host visibility from  public to local.
+
+    192.168.1.174   host11 host1.example.com
+    192.168.1.175   host12                      = local
+    192.168.1.177   host14                      = loc
+
+These entries describe hosts that are public, accessible externally via their IPREF addresses.
+
+    192.168.2.87    host21                      = pub
+    192.168.2.88    host22                      = public + 23a8-435cd
+    192.168.2.89    host23 host23.example.com   = pub gw.example.com + 76cab861
+
+These entries describe external hosts accessible via IPREF addresses. These entries are used if DNS is not available or is intentionally avoided.
+
+    10.247.1.228                                = external gw.example.org + 2b78-2e89
+    10.251.19.181   ext-host1                   = ext      gw.example.org + 46c8a104
+
+Syntax of the mapper.conf entries in Augmented BNF:
+
+    mapping = host-part [ map-part ]
+
+    host-part = ip *( 1*WSP hostname )
+
+    ip = dotted-decimal
+    hostname = dns-name
+
+    map-part = *WSP "=" *WSP [ ( local-map / public-map / external-map ) ]
+
+    local-map =   *1( "local" / "loc" )
+
+    public-map = ( "public" / "pub" ) [ 1*WSP ip ] [ 1*WSP "+" *WSP ref ]
+
+    external-map = ( "external" / "ext" ) 1*WSP ip *WSP "+" *WSP ref
