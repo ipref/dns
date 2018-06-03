@@ -6,6 +6,7 @@ IPREF uses a combination of an IP _address_ and a _reference_ to refer to hosts.
 For example:
 
     10.247.1.1 + 12345
+    gw.example.com + 6789a
     
 # IPREF Address Format
 
@@ -38,8 +39,11 @@ Definition of IPREF address using Augmented BNF
 
     ipref = ip *WSP "+" *WSP ref
     
-    ip = dotted-decimal-string          -- imprecise but conveys intention
-                                        -- other option will likely be allowed, such as DNS name
+    ip =  dotted-decimal-string
+    ip =/ dns-name
+    
+    dns-name = 1*(ALPHA / DIGIT) *( "-" 1*(ALPHA / DIGIT))
+    
     ref =  hex-string
     ref =/ decimal-string
     ref =/ dotted-decimal-string
