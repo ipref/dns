@@ -70,40 +70,36 @@ An IPREF resolver must issues queries for A, AAAA, and AA/TXT records, then pref
 
 # Static IPREF address mapping
 
-IPREF can lookup a file with static address mapping in lieu of, or in addition to, DNS queries. Such file plays a similar role to /etc/hosts for IPv4/IPv6. This file has fixed name and location:
+IPREF can use /etc/hosts to lookup static address mappings in lieu of, or in addition to, DNS queries. The syntax of /etc/hosts is extended to provide IPREF mappings. The extension is backward compatible. IPREF mappings are placed in comments and are marked by a '#' immediately followed by '='. A comment is still allowed at end of lines.
 
-    /etc/ipref/mapper.conf
-
-The format of the file follows that of /etc/hosts except it adds IPREF mapping option to each line. Mapping options start with '=' followed by mapping specification.
-
-    IP [HOSTNAME]... [= IPREF_MAPPING]
+    IP [HOSTNAME]... [#= IPREF_MAPPING]
 
 For example:
 
+    192.168.1.174   host1.example.com
+    192.168.2.87    host21              #= public + 2bs47   # implicit gateway
+    10.247.1.228    ext-host32          #= external gw.example.org + 2b78-2e89
+
+A mapping entry may designate a host as local, not visible externally, or it may designate a host as public, in which case the host will be accessible externally via an allocated IPREF address.  The allocation may be implicit where the ip portion and the reference portion of the IPREF address is left to the system to assign. It may also be explicit where the the reference, or ip address and the reverence, is listed directly in the entry. An entry may also describe an external IPREF address with its associated local encoded address by which local host may reach it.
+
+The different mapping options are indicated by a keyword such as _public_, _local_, or _external_. Keywords may be shortened to their first three letters.
+
+The _local_ entries describe hosts that are local, inaccessible externally. The use of _local_ keyword, instead of omitting mapping, is sometimes convenient when switching host visibility from  public to local.
+
     192.168.1.174   host11 host1.example.com
-    192.168.2.87    host21                      = public
-    10.247.1.228                                = external gw.example.org + 2b78-2e89
+    192.168.1.175   host12                      #= local
+    192.168.1.177   host14                      #= loc
 
-An entry in mapper.conf may designate a host as local, not visible externally, or it may designate a host as public, in which case the host will be accessible externally via an allocated IPREF address.  The allocation may be implicit where the ip portion and the reference portion of the IPREF address is left to the system to assign. It may also be explicit where the the reference, or ip address and the reverence, is listed directly in the entry. An entry may also describe an external IPREF address with its associated local encoded address by which local host may reach it.
+The _public_ entries describe hosts that are public, accessible externally via their IPREF addresses. The mapping describes how the hosts can be accessed externally. The gateway may be omitted if there is only one in the local network. These entry are not published via DNS. They're used for testing or for simple setups where DNS is not available or intentionally not used.
 
-The different mapping options are indicated by a keyword such as _public_, _local_, or _external_. Keywords may be shorted to their first three letters.
+    192.168.2.87    host21                      #= pub
+    192.168.2.88    host22                      #= public + 23a8-435cd
+    192.168.2.89    host23 host23.example.com   #= pub gw.example.com + 76cab861
 
-These entries describe hosts that are local, inaccessible externally. The use of _local_ keyword is sometimes convenient when switching host visibility from  public to local.
+These _external_ entries describe hosts residing on other local networks which are accessible via IPREF addresses. These entries are used if DNS is not available or is intentionally not used. The listed ip addresses refer to encoded addresses by which the external hosts can be reached from local hosts.
 
-    192.168.1.174   host11 host1.example.com
-    192.168.1.175   host12                      = local
-    192.168.1.177   host14                      = loc
-
-These entries describe hosts that are public, accessible externally via their IPREF addresses.
-
-    192.168.2.87    host21                      = pub
-    192.168.2.88    host22                      = public + 23a8-435cd
-    192.168.2.89    host23 host23.example.com   = pub gw.example.com + 76cab861
-
-These entries describe external hosts accessible via IPREF addresses. These entries are used if DNS is not available or is intentionally avoided.
-
-    10.247.1.228                                = external gw.example.org + 2b78-2e89
-    10.251.19.181   ext-host1                   = ext      gw.example.org + 46c8a104
+    10.247.1.228                                #= external gw.example.org + 2b78-2e89
+    10.251.19.181   ext-host1                   #= ext      gw.example.org + 46c8a104
 
 Syntax of the mapper.conf entries in Augmented BNF:
 
@@ -114,7 +110,7 @@ Syntax of the mapper.conf entries in Augmented BNF:
     ip = dotted-decimal
     hostname = dns-name
 
-    map-part = *WSP "=" *WSP [ ( local-map / public-map / external-map ) ]
+    map-part = *WSP "#=" *WSP [ ( local-map / public-map / external-map ) ]
 
     local-map =   *1( "local" / "loc" )
 
