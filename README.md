@@ -80,7 +80,7 @@ For example:
     192.168.2.87    host21              #= public + 2bs47   # implicit gateway
     10.247.1.228    ext-host32          #= external gw.example.org + 2b78-2e89
 
-A mapping entry may designate a host as local, not visible externally, or it may designate a host as public, in which case the host will be accessible externally via an allocated IPREF address.  The allocation may be implicit where the ip portion and the reference portion of the IPREF address is left to the system to assign. It may also be explicit where the the reference, or ip address and the reverence, is listed directly in the entry. An entry may also describe an external IPREF address with its associated local encoded address by which local host may reach it.
+A mapping entry may designate a host as local, i.e. not visible externally, or it may designate a host as public, in which case the host will be accessible externally via an allocated IPREF address.  The allocation may be implicit where the ip portion and the reference portion of the IPREF address is left to the system to assign. It may also be explicit where the reference, or both ip address and the reference, is listed directly in the entry. An entry may also describe an external IPREF address with its associated local encoded address by which local host may reach it.
 
 The different mapping options are indicated by a keyword such as _public_, _local_, or _external_. Keywords may be shortened to their first three letters.
 
@@ -90,7 +90,7 @@ The _local_ entries describe hosts that are local, inaccessible externally. The 
     192.168.1.175   host12                      #= local
     192.168.1.177   host14                      #= loc
 
-The _public_ entries describe hosts that are public, accessible externally via their IPREF addresses. The mapping describes how the hosts can be accessed externally. The gateway may be omitted if there is only one in the local network. These entry are not published via DNS. They're used for testing or for simple setups where DNS is not available or intentionally not used.
+The _public_ entries describe hosts that are public, accessible externally via their IPREF addresses. The mapping describes how the hosts can be accessed externally. The gateway may be omitted if there is only one in the local network. These entries are not published via DNS. They're used for testing or for simple setups where DNS is not available or intentionally not used.
 
     192.168.2.87    host21                      #= pub
     192.168.2.88    host22                      #= public + 23a8-435cd
