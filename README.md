@@ -5,7 +5,7 @@ IPREF uses a combination of an IP _address_ and a _reference_ to refer to hosts.
 
 For example:
 
-    10.247.1.1 + 12345
+    192.0.2.1 + 12345
     gw.example.com + 6-789a
 
 # IPREF Address Format
@@ -14,26 +14,26 @@ References are opaque unsigned integers. Different representations may be used.
 
 Default representation is a decimal string.
 
-    10.247.1.1 + 5123457
+    192.0.2.1 + 5123457
 
 Hex representation uses dashes to separate fields in reference strings. Dashes are ignored.
 
-    10.247.1.1 + 51-23457
-    10.247.1.1 + ab-d259e-24171
-    10.247.1.1 + 235a-2156-bcd1                        -- 16 bit fields
-    10.247.1.1 + 123e4567-e89b-12d3-a456-426655440000  -- UUID style
+    192.0.2.1 + 51-23457
+    192.0.2.1 + ab-d259e-24171
+    192.0.2.1 + 235a-2156-bcd1                        -- 16 bit fields
+    192.0.2.1 + 123e4567-e89b-12d3-a456-426655440000  -- UUID style
 
 Decimal representation may use commas. Commas are optional and are ignored.
 
-    10.245.2.2 + 85                     -- standard decimal 85
-    10.247.1.1 + 0,85                   -- decimal 85
-    10.247.1.1 + 12,345,136,118         -- classic thousands separator
+    192.0.2.1 + 85                     -- decimal 85
+    198.51.100.1 + 0,85                -- decimal 85
+    203.0.113.1 + 12,345,136,118       -- classic thousands separator
 
 Dotted decimal representation resembles IPv4 notation but it's not fixed to four positions.
 
-    10.247.1.1 + 0.85                   -- single byte reference
-    10.247.1.1 + 10.236.228.4.18        -- five byte reference
-    10.247.1.1 + 28.48.236.172          -- four byte reference (not an IP address)
+    192.0.2.1 + 0.85                   -- single byte reference
+    192.0.2.1 + 10.236.228.4.18        -- five byte reference
+    192.0.2.1 + 28.48.236.172          -- four byte reference (not an IP address)
 
 Commas, dashes, and periods must be surrounded by digits on both sides.
 
@@ -60,15 +60,15 @@ IPREF needs a dedicated record type. The plan is to register type AA with IANA. 
 
     host1.example.com.  IN  AA   gw.example.com + 25b7-2345
     host2               IN  AA   gw.example.com + 2,347,275,120
-    host3               IN  AA   10.247.1.1 + c184-234f-980a
+    host3               IN  AA   192.0.2.1 + c184-234f-980a
 
 As a workaround for an unavailable record type, IPREF uses TXT records to embed the contents of AA records. For example the above entries as TXT records look like this:
 
     host1.example.com.  IN  TXT  "AA gw.example.com + 25b7-2345"
     host2               IN  TXT  "AA gw.example.com + 2,347,275,120"
-    host3               IN  TXT  "AA 10.247.1.1 + c184-234f-980a"
+    host3               IN  TXT  "AA 192.0.2.1 + c184-234f-980a"
 
-An IPREF resolver must issues queries for A, AAAA, and AA records, then prefer AA over A/AAAA. Typically, A/AAAA would not return if AA is found but resolver cannot rely on that behavior.
+An IPREF resolver must issue queries for A, AAAA, and AA records, then prefer AA over A/AAAA. Typically, A/AAAA would not return if AA is found but resolver cannot rely on that behavior.
 
 # Static IPREF address mapping
 
